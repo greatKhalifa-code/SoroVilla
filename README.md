@@ -1,20 +1,20 @@
-#SoroVault
+# SoroVilla
 
-[![CI](https://github.com/soroworks/sorovault/actions/workflows/ci.yml/badge.svg)](https://github.com/soroworks/sorovault/actions/workflows/ci.yml)
-[![Security](https://github.com/soroworks/sorovault/actions/workflows/security.yml/badge.svg)](https://github.com/soroworks/sorovault/actions/workflows/security.yml)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/soroworks/sorovault/badge)](https://api.securityscorecards.dev/projects/github.com/soroworks/sorovault)
-[![Release](https://img.shields.io/github/v/release/soroworks/sorovault)](https://github.com/soroworks/sorovault/releases/latest)
-[![Go](https://img.shields.io/github/go-mod/go-version/soroworks/sorovault)](go.mod)
-[![License](https://img.shields.io/github/license/soroworks/sorovault)](LICENSE)
+[![CI](https://github.com/soroworks/sorovilla/actions/workflows/ci.yml/badge.svg)](https://github.com/soroworks/sorovilla/actions/workflows/ci.yml)
+[![Security](https://github.com/soroworks/sorovilla/actions/workflows/security.yml/badge.svg)](https://github.com/soroworks/sorovilla/actions/workflows/security.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/soroworks/sorovilla/badge)](https://api.securityscorecards.dev/projects/github.com/soroworks/sorovilla)
+[![Release](https://img.shields.io/github/v/release/soroworks/sorovilla)](https://github.com/soroworks/sorovilla/releases/latest)
+[![Go](https://img.shields.io/github/go-mod/go-version/soroworks/sorovilla)](go.mod)
+[![License](https://img.shields.io/github/license/soroworks/sorovilla)](LICENSE)
 
 A contract metadata and interface (ABI) registry for the Stellar/Soroban network.
 
 > [!NOTE]
 > **Repository Split**: The project is split into two standalone repositories:
-> - **Core Engine & Backend**: [`sorovault`](file:///home/computeroracle/Desktop/sorovault) — Go RPC parser, XDR decoder, PostgreSQL registry, and REST API.
-> - **Visual Explorer & Studio**: [`sorovault-frontend`](file:///home/computeroracle/Desktop/sorovault-frontend) — Vite & TypeScript web application, interactive ABI inspector, Soroban simulation playground, and SDK generator (running at `http://localhost:3004`).
+> - **Core Engine & Backend**: [`sorovilla`](file:///home/computeroracle/Desktop/sorovilla) — Go RPC parser, XDR decoder, PostgreSQL registry, and REST API.
+> - **Visual Explorer & Studio**: [`sorovilla-frontend`](file:///home/computeroracle/Desktop/sorovilla-frontend) — Vite & TypeScript web application, interactive ABI inspector, Soroban simulation playground, and SDK generator (running at `http://localhost:3004`).
 
-SoroVault fetches a deployed contract's WASM, decodes the interface embedded in
+SoroVilla fetches a deployed contract's WASM, decodes the interface embedded in
 it, stores it, and serves a searchable registry — so tools and humans can
 discover what functions and types a contract exposes.
 
@@ -32,7 +32,7 @@ The interface is right there in the uploaded WASM — Soroban embeds it as a
 entries to read, how to walk a WASM binary, and how to decode a stream of XDR.
 Every tool that wants to know what a contract does re-implements that.
 
-SoroVault does it once and serves the result as clean JSON:
+SoroVilla does it once and serves the result as clean JSON:
 
 ```console
 $ curl -s localhost:8080/api/contracts/CDZZ…4PAN | jq '.interface.functions[].name'
@@ -77,7 +77,7 @@ rather than recalled. Verified **2026-08-07**:
 
 > **On the SDK:** the original plan named `github.com/stellar/go`. That module is
 > now formally deprecated — its `go.mod` carries
-> `// Deprecated: Use github.com/stellar/go-stellar-sdk instead` — so SoroVault
+> `// Deprecated: Use github.com/stellar/go-stellar-sdk instead` — so SoroVilla
 > builds against the successor. This is also why the Go floor is 1.25 rather
 > than the 1.22 originally targeted: the new SDK requires it.
 
@@ -90,7 +90,7 @@ Worth writing down, because it is the part that is easy to get wrong:
    `Persistent` durability. `getLedgerEntries` returns a `ContractDataEntry`
    whose `Val.Instance.Executable.WasmHash` names the module.
    - A Stellar Asset Contract has no `WasmHash` — it is built into the host, so
-     there is no uploaded interface to decode. SoroVault recognizes the on-ledger
+     there is no uploaded interface to decode. SoroVilla recognizes the on-ledger
      `CONTRACT_EXECUTABLE_STELLAR_ASSET` discriminant and serves the documented
      built-in interface under the stable identifier
      `builtin:stellar-asset-contract:v1`. Its interface JSON is marked
@@ -135,7 +135,7 @@ The fastest path is Docker, which brings up Postgres, applies migrations and
 starts the server:
 
 ```console
-$ git clone https://github.com/soroworks/sorovault && cd sorovault
+$ git clone https://github.com/soroworks/sorovilla && cd sorovilla
 $ make up
 ```
 
@@ -150,10 +150,10 @@ $ curl -X POST localhost:8080/api/contracts \
 Open <http://localhost:8080> for the browse UI.
 
 To run a published image instead of building from source, set
-`SOROVAULT_IMAGE`; `make up` still builds locally because it passes `--build`:
+`SOROVILLA_IMAGE`; `make up` still builds locally because it passes `--build`:
 
 ```console
-$ SOROVAULT_IMAGE=ghcr.io/soroworks/sorovault:1.2.3 docker compose up
+$ SOROVILLA_IMAGE=ghcr.io/soroworks/sorovilla:1.2.3 docker compose up
 ```
 
 ### Verifying a release
@@ -163,30 +163,30 @@ build-provenance attestation. Verify the archive you downloaded and match it
 to the SBOM before running it:
 
 ```console
-$ gh attestation verify sorovault_1.2.3_linux_amd64.tar.gz \
-    --repo soroworks/sorovault
+$ gh attestation verify sorovilla_1.2.3_linux_amd64.tar.gz \
+    --repo soroworks/sorovilla
 $ sha256sum -c checksums.txt --ignore-missing
-$ jq '.packages[] | {name, version}' sorovault_1.2.3_linux_amd64.tar.gz.sbom.json
+$ jq '.packages[] | {name, version}' sorovilla_1.2.3_linux_amd64.tar.gz.sbom.json
 ```
 
-Container images are published as `ghcr.io/soroworks/sorovault:<version>` and
+Container images are published as `ghcr.io/soroworks/sorovilla:<version>` and
 `:latest` for `linux/amd64` and `linux/arm64`.
 
 ### Kubernetes with Helm
 
-The chart at [`deploy/helm/sorovault`](deploy/helm/sorovault) deploys the API
+The chart at [`deploy/helm/sorovilla`](deploy/helm/sorovilla) deploys the API
 and runs database migrations before install and upgrade. It expects an
 existing PostgreSQL database; it does not install or manage PostgreSQL. Create
 a Secret containing the connection URL, then install the chart:
 
 ```console
-$ kubectl create secret generic sorovault-db \\
-  --from-literal=DATABASE_URL='postgres://sorovault:password@postgres:5432/sorovault?sslmode=disable'
-$ helm upgrade --install sorovault ./deploy/helm/sorovault \\
-  --set database.existingSecret=sorovault-db
+$ kubectl create secret generic sorovilla-db \\
+  --from-literal=DATABASE_URL='postgres://sorovilla:password@postgres:5432/sorovilla?sslmode=disable'
+$ helm upgrade --install sorovilla ./deploy/helm/sorovilla \\
+  --set database.existingSecret=sorovilla-db
 ```
 
-The secret name and key, image, service, and SoroVault environment settings can
+The secret name and key, image, service, and SoroVilla environment settings can
 be overridden in a values file. `RPC_URL`, `NETWORK_PASSPHRASE`, `HTTP_ADDR`,
 `LOG_LEVEL`, `RPC_TIMEOUT`, and `REFRESH_INTERVAL` are exposed under `config`;
 use `extraEnv` for other environment variables. The server and migration Job
@@ -202,9 +202,9 @@ $ cp .env.example .env          # adjust as needed
 $ set -a && source .env && set +a
 
 $ docker compose up -d db       # or point DATABASE_URL at your own Postgres
-$ go run ./cmd/sorovault migrate
-$ go run ./cmd/sorovault add CDZZXVGUCLBUTE3WDD6TF2NXPTBPOYTVPPBBIZMSPVIQLUG226XJ4PAN
-$ go run ./cmd/sorovault serve
+$ go run ./cmd/sorovilla migrate
+$ go run ./cmd/sorovilla add CDZZXVGUCLBUTE3WDD6TF2NXPTBPOYTVPPBBIZMSPVIQLUG226XJ4PAN
+$ go run ./cmd/sorovilla serve
 ```
 
 ## Configuration
@@ -214,7 +214,7 @@ All configuration is environment variables. Only `DATABASE_URL` (or the path in 
 ### A YAML file as the base layer
 
 As the settings list grows, a reviewed file is easier to manage than a wall
-of exports. Pass `--config sorovault.yaml` (the `CONFIG_PATH` env var works
+of exports. Pass `--config sorovilla.yaml` (the `CONFIG_PATH` env var works
 too) and the file's values sit under the environment: the environment
 overrides the file setting by setting — an operator who exported a
 variable did so deliberately, usually in a container — and defaults still
@@ -233,7 +233,7 @@ read_only: true
 cors_origins: "https://dashboard.example.com"
 ```
 
-Run `sorovault config show` to print the effective configuration — file,
+Run `sorovilla config show` to print the effective configuration — file,
 environment and defaults merged — with the secrets redacted: the
 connection string keeps its host and loses its password, tokens report
 only how many are configured, and the webhook secret is not even shaped
@@ -258,7 +258,7 @@ back out of what it became. `--json` prints the same rows for scripts.
 | `REFRESH_WEBHOOK_SECRET` | — | sign webhook payloads with HMAC-SHA256 |
 | `REFRESH_EVENTS` | `false` | follow the network's upgrade events and refresh a contract as soon as it is upgraded; needs `REFRESH_INTERVAL` |
 | `REFRESH_EVENTS_INTERVAL` | `10s` | how often new upgrade events are read; minimum `2s` |
-| `SIGNING_KEY` | — | sign interface responses with this Ed25519 key (base64 32-byte seed; or `SIGNING_KEY_FILE`). `sorovault keygen` makes one |
+| `SIGNING_KEY` | — | sign interface responses with this Ed25519 key (base64 32-byte seed; or `SIGNING_KEY_FILE`). `sorovilla keygen` makes one |
 | `SIGNING_RETIRED_KEYS` | — | comma-separated base64 public keys of earlier signing keys, kept at `GET /api/keys` so old signatures stay verifiable |
 | `RATE_LIMIT_PER_MINUTE` | `30` | registrations and refreshes allowed per client per minute |
 | `RATE_LIMIT_BURST` | `10` | how many of those may arrive at once |
@@ -268,13 +268,13 @@ back out of what it became. `--json` prints the same rows for scripts.
 | `API_TOKENS` | — | comma-separated bearer tokens the write endpoints accept; unset keeps writes public |
 | `CONFIG_PATH` | — | YAML config file whose values sit under the environment (`--config` names it explicitly) |
 
-`NETWORK_PASSPHRASE` is a guard, not a source of truth. SoroVault reads the real
+`NETWORK_PASSPHRASE` is a guard, not a source of truth. SoroVilla reads the real
 passphrase from the RPC endpoint and refuses to proceed if the two disagree, so
 a stale `RPC_URL` cannot quietly file mainnet contracts under `testnet`.
 
 ### Automatic refresh
 
-Set `REFRESH_INTERVAL` (for example `6h`) and `sorovault serve` re-checks, on
+Set `REFRESH_INTERVAL` (for example `6h`) and `sorovilla serve` re-checks, on
 that schedule, every contract on its network that has not been refreshed
 within the interval. An upgraded contract gets a new interface version
 exactly as `POST /api/contracts/{id}/refresh` would record it; an unchanged
@@ -374,19 +374,19 @@ keep a receiver informed. A delivery that fails is logged.
 
 Set `REFRESH_WEBHOOK_SECRET` to sign the payloads. The signature is the
 HMAC-SHA256 of the raw request body, keyed with the secret, hex-encoded and
-sent in the `X-SoroVault-Signature` header:
+sent in the `X-SoroVilla-Signature` header:
 
 ```
-X-SoroVault-Signature: sha256=6f3a…
+X-SoroVilla-Signature: sha256=6f3a…
 ```
 
 A receiver recomputes it over the body it received and compares the two in
 constant time. A mismatch means the payload was tampered with, or did not
-come from SoroVault at all.
+come from SoroVilla at all.
 
 ### Who deployed a contract
 
-On registration SoroVault works out which account created the contract and in
+On registration SoroVilla works out which account created the contract and in
 which ledger, and stores both. They appear in the API (`origin` in
 `GET /api/contracts/{id}`, `creator` and `created_ledger` in listings) and on
 the contract page. When they cannot be determined the API says so
@@ -402,7 +402,7 @@ its own) is the creator. This has two limits, both deliberate:
   be traced.
 - A contract modified since it was created — upgraded, or with instance
   storage written — has a "last modified" ledger that is no longer its
-  creation. SoroVault reports it as unknown rather than guess, because
+  creation. SoroVilla reports it as unknown rather than guess, because
   publisher verification (below) trusts this value.
 
 Horizon, which keeps full history, could answer both cases, but it has no
@@ -410,7 +410,7 @@ lookup by contract; finding a creation there means scanning operations. The
 lookup sits behind `stellar.OriginFinder`, so a Horizon-backed finder can be
 added without touching the registry.
 
-`sorovault backfill-origins` fills in contracts registered before this existed,
+`sorovilla backfill-origins` fills in contracts registered before this existed,
 or whose lookup failed. It only looks at contracts still without a creator, so
 it is safe to run repeatedly.
 
@@ -421,8 +421,8 @@ does not say who stands behind it. A publisher who controls the account that
 deployed a contract can prove it by signing a claim:
 
 ```console
-$ export SOROVAULT_PUBLISHER_SECRET=S…     # the deploying account's secret seed
-$ sorovault claim sign CDZZ…4PAN --name "ZK Vote" \
+$ export SOROVILLA_PUBLISHER_SECRET=S…     # the deploying account's secret seed
+$ sorovilla claim sign CDZZ…4PAN --name "ZK Vote" \
     --source-url https://github.com/example/zkvote \
   | curl -X POST -H 'content-type: application/json' -d @- \
     https://registry.example/api/contracts/CDZZ…4PAN/verify
@@ -430,7 +430,7 @@ $ sorovault claim sign CDZZ…4PAN --name "ZK Vote" \
 
 `claim sign` signs locally and prints the request body; the seed is read from
 the environment (never a flag) and is never sent anywhere. The signed message is
-`sorovault-claim-v1\n` followed by the [canonical JSON](#signed-attestations) of
+`sorovilla-claim-v1\n` followed by the [canonical JSON](#signed-attestations) of
 `{v, network, contract_id, name, source_url, source_commit?, wasm_hash?,
 issued_at}`, signed with the account's Ed25519 key, so any Stellar SDK can
 produce it.
@@ -463,20 +463,20 @@ differs from the one they sign with can sign with the deployer.
 
 ### Signed attestations
 
-A client that trusts SoroVault's decoded interfaces has to trust the transport
+A client that trusts SoroVilla's decoded interfaces has to trust the transport
 and the server. With a signing key, every interface response says which
 registry produced it, in a way that survives caches and mirrors.
 
 ```console
-$ sorovault keygen > signing.key          # seed on stdout; key id and public key on stderr
-$ SIGNING_KEY_FILE=signing.key sorovault serve
+$ sorovilla keygen > signing.key          # seed on stdout; key id and public key on stderr
+$ SIGNING_KEY_FILE=signing.key sorovilla serve
 ```
 
 `GET /api/contracts/{id}` and `GET /api/wasm/{hash}` then carry two headers:
 
 ```
-X-SoroVault-Attestation: <base64 Ed25519 signature>
-X-SoroVault-Key-Id: 65b60673d6ed884b
+X-SoroVilla-Attestation: <base64 Ed25519 signature>
+X-SoroVilla-Key-Id: 65b60673d6ed884b
 ```
 
 and `GET /api/keys` publishes the public keys to verify against (the current key
@@ -484,7 +484,7 @@ first, then any in `SIGNING_RETIRED_KEYS`). To rotate: generate a new key, move
 the old public key into `SIGNING_RETIRED_KEYS`, and set `SIGNING_KEY` to the new
 seed; old signatures keep verifying and new responses use the new key.
 
-The signature covers the string `sorovault-attestation-v1\n` followed by the
+The signature covers the string `sorovilla-attestation-v1\n` followed by the
 canonical JSON of
 
 ```json
@@ -494,7 +494,7 @@ canonical JSON of
 built from the response body the client already has (`contract_id` is left out
 for `/api/wasm/{hash}`), so verifying needs no further request. The canonical
 form is [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) for the integer-only
-documents SoroVault serves: no whitespace, object keys sorted by UTF-16 code
+documents SoroVilla serves: no whitespace, object keys sorted by UTF-16 code
 unit, strings escaping only `"`, `\` and control characters (`<`, `&` and
 U+2028 are written as themselves), integers as digits. The domain prefix means
 a signature made for an attestation can never be replayed as a publisher claim.
@@ -564,7 +564,7 @@ the same **503**, with the `Retry-After` header, inline on the page.
 
 ### Connection pool
 
-SoroVault talks to Postgres through pgx's pool. Two variables size it:
+SoroVilla talks to Postgres through pgx's pool. Two variables size it:
 
 | Variable | Default | Purpose |
 |---|---|---|
@@ -582,7 +582,7 @@ is a minimum above the maximum.
 the connection string:
 
 ```text
-postgres://…/sorovault?sslmode=disable&pool_max_conns=8
+postgres://…/sorovilla?sslmode=disable&pool_max_conns=8
 ```
 
 The environment wins. `DATABASE_MAX_CONNS`, when it is set, replaces
@@ -598,7 +598,7 @@ A sensible maximum is therefore well below the database's own
 `max_connections` (100 by default), leaving room for the migrations, the
 `psql` sessions and the monitoring that share the same server.
 
-SoroVault is mostly read-only — API reads are short queries, and a refresh
+SoroVilla is mostly read-only — API reads are short queries, and a refresh
 sweep is the only sustained traffic — so the default pool is usually
 enough. Raise `DATABASE_MAX_CONNS` when requests queue behind a busy pool
 (`pool timeout` errors, or latency that grows with load), not because the
@@ -661,7 +661,7 @@ $ curl -s localhost:8080/api/contracts/CDZZ…4PAN/functions/has_voted/example.j
 {"nullifier":"0000000000000000000000000000000000000000000000000000000000000000"}
 ```
 
-`sorovault codegen --lang examples` writes the same examples for every function
+`sorovilla codegen --lang examples` writes the same examples for every function
 at once, one entry per function name.
 
 **Batches.** `POST /api/contracts:batch` registers up to 20 contracts in one
@@ -724,7 +724,7 @@ an interface is spelled a particular way. The filters combine with `?q=` and
 
 Status codes worth knowing: **422** means the contract exists but has no
 interface to serve (a Stellar asset contract, a module with no spec section,
-or one over SoroVault's decode limits), as distinct from **404**, which means
+or one over SoroVilla's decode limits), as distinct from **404**, which means
 it is not there at all.
 
 **Statistics and the upgrade feed.** `GET /api/stats` is the registry's size
@@ -791,26 +791,26 @@ beside it.
 ## CLI
 
 ```console
-sorovault add <contract_id>...      # fetch, decode and register (--from-file)
-sorovault remove <contract_id>      # delete a contract and its versions (--yes)
-sorovault refresh <contract_id>...  # re-check for an upgraded interface (--from-file)
-sorovault refresh --all             # one sweep over every contract (--json)
-sorovault list                      # -q, --function, --type, --network, --limit, --offset
-sorovault get <contract_id>         # --function, --wasm-hash, --json
-sorovault versions <contract_id>    # --network, --json
-sorovault codegen <contract_id>     # --lang ts|md|examples; -o, --wasm-hash, --package, --zod
-sorovault codegen <contract_id>     # --lang ts|md|examples; -o, --wasm-hash, --package
-sorovault check-client <client.ts>  # --contract, --api, --network; exits non-zero when stale
-sorovault export [file]             # versioned JSON backup (-o)
-sorovault import [file]             # restore a backup (--merge)
-sorovault serve                     # JSON API + browse UI
-sorovault backfill-origins          # find the creator of contracts that lack one (--json)
-sorovault claim sign <contract_id>  # sign a publisher claim (--name, --source-url, ...)
-sorovault keygen                    # make an attestation signing key
-sorovault migrate                   # apply schema migrations
-sorovault migrate status            # --json
-sorovault doctor                    # check a deployment's health
-sorovault config show               # print the effective configuration, secrets redacted (--json)
+sorovilla add <contract_id>...      # fetch, decode and register (--from-file)
+sorovilla remove <contract_id>      # delete a contract and its versions (--yes)
+sorovilla refresh <contract_id>...  # re-check for an upgraded interface (--from-file)
+sorovilla refresh --all             # one sweep over every contract (--json)
+sorovilla list                      # -q, --function, --type, --network, --limit, --offset
+sorovilla get <contract_id>         # --function, --wasm-hash, --json
+sorovilla versions <contract_id>    # --network, --json
+sorovilla codegen <contract_id>     # --lang ts|md|examples; -o, --wasm-hash, --package, --zod
+sorovilla codegen <contract_id>     # --lang ts|md|examples; -o, --wasm-hash, --package
+sorovilla check-client <client.ts>  # --contract, --api, --network; exits non-zero when stale
+sorovilla export [file]             # versioned JSON backup (-o)
+sorovilla import [file]             # restore a backup (--merge)
+sorovilla serve                     # JSON API + browse UI
+sorovilla backfill-origins          # find the creator of contracts that lack one (--json)
+sorovilla claim sign <contract_id>  # sign a publisher claim (--name, --source-url, ...)
+sorovilla keygen                    # make an attestation signing key
+sorovilla migrate                   # apply schema migrations
+sorovilla migrate status            # --json
+sorovilla doctor                    # check a deployment's health
+sorovilla config show               # print the effective configuration, secrets redacted (--json)
 ```
 
 `add` and `refresh` accept several contract IDs and report per-contract
@@ -821,7 +821,7 @@ for the same exact-name filters the API offers. Every read command takes
 `--json`, which emits exactly what the API serves:
 
 ```console
-$ sorovault get CDZZ…4PAN --function has_voted
+$ sorovilla get CDZZ…4PAN --function has_voted
 fn has_voted(nullifier: BytesN<32>) -> bool
 
 inputs:
@@ -830,16 +830,16 @@ inputs:
 returns: bool
 ```
 
-`sorovault versions` lists a contract's stored interface history, newest
+`sorovilla versions` lists a contract's stored interface history, newest
 first, so the hash `get --wasm-hash` wants is one command away:
 
 ```console
-$ sorovault versions CDZZ…4PAN
+$ sorovilla versions CDZZ…4PAN
 WASM HASH                                                         DECODED           CURRENT
 c618dae264864ccf446a3c7db27da80c7c83e840131242cc2fe9cd32a2a20781  2026-08-07 09:14  yes
 ```
 
-### `sorovault doctor`
+### `sorovilla doctor`
 
 When a deployment misbehaves, the same four questions come up: can it reach
 Postgres, are the migrations up to date, does the RPC endpoint answer, and
@@ -847,7 +847,7 @@ is it serving the network this instance expects. `doctor` answers all four in
 one go:
 
 ```console
-$ sorovault doctor
+$ sorovilla doctor
 PASS  database    the database answers
 PASS  migrations  the database is at version 2, the latest is 2
 PASS  rpc         the endpoint is reachable, serving testnet
@@ -859,12 +859,12 @@ exits non-zero if any of them failed. `--json` emits the same report for a
 script to read:
 
 ```console
-$ sorovault doctor --json
+$ sorovilla doctor --json
 {
   "ok": false,
   "checks": [
     { "name": "database", "ok": true, "detail": "the database answers" },
-    { "name": "migrations", "ok": false, "error": "the database is at version 1, but version 2 is available; run `sorovault migrate`" },
+    { "name": "migrations", "ok": false, "error": "the database is at version 1, but version 2 is available; run `sorovilla migrate`" },
     { "name": "rpc", "ok": true, "detail": "the endpoint is reachable, serving testnet" },
     { "name": "passphrase", "ok": true, "detail": "the endpoint serves the configured network" }
   ]
@@ -877,14 +877,14 @@ the network. It reads the same configuration as everything else, so a
 deployment missing its `DATABASE_URL` is reported as a configuration error
 rather than a passing check.
 
-### `sorovault migrate status`
+### `sorovilla migrate status`
 
 Before an upgrade, an operator wants to know what is applied and what is
 pending — without applying anything. `migrate status` says exactly that, and
 nothing more:
 
 ```console
-$ sorovault migrate status
+$ sorovilla migrate status
 current version: 2
 latest version:  4
 
@@ -895,13 +895,13 @@ pending migrations:
 ```
 
 The version the database has applied, and whether it is dirty, come from
-golang-migrate — the same source `sorovault migrate` applies, so the two
+golang-migrate — the same source `sorovilla migrate` applies, so the two
 cannot disagree. The latest version, and the migrations still to come, are
 the ones embedded in this binary. No migration is applied: a status run
 reports and stops there. It does read the database through golang-migrate,
 which creates the migrator's own version table if the database has not been
 migrated yet — nothing else is written. A database role that may only read
-will therefore fail the command; `sorovault doctor` reads the same state
+will therefore fail the command; `sorovilla doctor` reads the same state
 without writing anything.
 
 The command exits non-zero when migrations are pending, so it can gate a
@@ -914,7 +914,7 @@ a person. The `message` says what the report means and what to do about it,
 so a reader of the JSON is told what a reader of the text report is:
 
 ```console
-$ sorovault migrate status --json
+$ sorovilla migrate status --json
 {
   "current_version": 2,
   "latest_version": 4,
@@ -923,21 +923,21 @@ $ sorovault migrate status --json
     { "version": 3, "name": "wasm_specs" },
     { "version": 4, "name": "contract_source" }
   ],
-  "message": "2 migration(s) pending; run `sorovault migrate` to apply them"
+  "message": "2 migration(s) pending; run `sorovilla migrate` to apply them"
 }
 ```
 ### Shell completion
 
-`sorovault completion bash|zsh|fish|powershell` prints a completion script (this
+`sorovilla completion bash|zsh|fish|powershell` prints a completion script (this
 is Cobra's built-in command; run it once per shell). Then `Tab` completes the
 arguments that are otherwise awkward to type:
 
 ```console
-$ sorovault get <Tab>
+$ sorovilla get <Tab>
 CDZZXVGUCLBUTE3WDD6TF2NXPTBPOYTVPPBBIZMSPVIQLUG226XJ4PAN  zkvote
 CBQZ…
 
-$ sorovault get CDZZ --network <Tab>
+$ sorovilla get CDZZ --network <Tab>
 testnet  futurenet  mainnet
 ```
 
@@ -959,12 +959,12 @@ takes contract IDs or `--all`, so it offers no IDs once `--all` is set.
 
 ## Typed clients
 
-SoroVault generates a typed TypeScript client for any registered contract —
+SoroVilla generates a typed TypeScript client for any registered contract —
 from the stored interface, so it needs no network access, and for any
 version by `?wasm_hash=`:
 
 ```console
-$ sorovault codegen CDZZ…4PAN -o zkvote.ts
+$ sorovilla codegen CDZZ…4PAN -o zkvote.ts
 $ curl -s localhost:8080/api/contracts/CDZZ…4PAN/client.ts > zkvote.ts
 ```
 
@@ -1024,7 +1024,7 @@ mismatch, and returns whether the client still matches:
 ```ts
 import { assertSameWasm, connect } from "./zkvote";
 
-const meta = await fetch("https://sorovault.example/api/contracts/CDZZ…4PAN").then(r => r.json());
+const meta = await fetch("https://sorovilla.example/api/contracts/CDZZ…4PAN").then(r => r.json());
 if (!assertSameWasm(meta.wasm_hash)) {
   // The contract was upgraded: regenerate, or keep the behavior your
   // app was built against with the pinned client ?wasm_hash= serves.
@@ -1039,12 +1039,12 @@ byte-identical until the interface actually changes.
 
 Generated clients embed the WASM hash they were built for as the `wasmHash`
 constant next to `contractId`. For a project that commits its client,
-`sorovault check-client` compares that file with SoroVault's live hash and
+`sorovilla check-client` compares that file with SoroVilla's live hash and
 with the client the server would generate now, and names the functions
 added, removed or changed when the interface moved:
 
 ```console
-$ sorovault check-client zkvote.ts --contract CDZZ…4PAN --api https://sorovault.example
+$ sorovilla check-client zkvote.ts --contract CDZZ…4PAN --api https://sorovilla.example
 zkvote.ts: added to the interface
 tally: added to the interface
 zkvote.ts is stale; regenerate it and commit the result
@@ -1059,7 +1059,7 @@ a reason instead of failing deep inside a call.
 can be published to a registry or installed from a tarball:
 
 ```console
-$ sorovault codegen CDZZ…4PAN --package --name @acme/zkvote -o zkvote-client
+$ sorovilla codegen CDZZ…4PAN --package --name @acme/zkvote -o zkvote-client
 wrote zkvote-client (4 files)
 ```
 
@@ -1086,7 +1086,7 @@ including function signatures and comments, user-defined types, events, and
 the selected WASM version:
 
 ```console
-$ sorovault codegen CDZZ…4PAN --lang md -o CONTRACT.md
+$ sorovilla codegen CDZZ…4PAN --lang md -o CONTRACT.md
 ```
 
 The browse UI renders the same documentation as Markdown, because that is
@@ -1225,7 +1225,7 @@ because adding an optional field is not a breaking change.
 ## How it fits together
 
 ```
-cmd/sorovault      cobra CLI; also serves the API and UI
+cmd/sorovilla      cobra CLI; also serves the API and UI
 internal/config    environment configuration
 internal/model     the ABI model — no dependencies, the public JSON contract
 internal/wasm      WASM custom-section reader
@@ -1295,7 +1295,7 @@ Contributions welcome. Deliberately **not** built yet:
 - **Resolving contract names.** The schema carries a `name`, but nothing
   populates it yet.
 Explicitly out of scope: authentication, and any write operation against
-contracts themselves. SoroVault reads chain state; it never sends a transaction.
+contracts themselves. SoroVilla reads chain state; it never sends a transaction.
 
 ## License
 
@@ -1304,6 +1304,6 @@ Apache-2.0. See [LICENSE](LICENSE).
 
 ## Token standard detection
 
-SoroVault classifies a contract against versioned interface definitions after decoding its interface. The first matcher is SEP-41 Soroban Token Interface [v0.5.2](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0041.md), a draft version pinned by the matcher. Matching requires every required function name, ordered argument type, and return type to match exactly; names alone are not enough. The API accepts repeatable `implements` filters, for example `GET /api/contracts?implements=sep41`, and the browse list shows a badge for detected standards.
+SoroVilla classifies a contract against versioned interface definitions after decoding its interface. The first matcher is SEP-41 Soroban Token Interface [v0.5.2](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0041.md), a draft version pinned by the matcher. Matching requires every required function name, ordered argument type, and return type to match exactly; names alone are not enough. The API accepts repeatable `implements` filters, for example `GET /api/contracts?implements=sep41`, and the browse list shows a badge for detected standards.
 
 Existing registry rows are classified on their next successful registration or refresh. The migration does not infer standards from old JSON rows, so an older contract will not appear in a standard-filtered listing until refreshed.
