@@ -9,6 +9,11 @@
 
 A contract metadata and interface (ABI) registry for the Stellar/Soroban network.
 
+> [!NOTE]
+> **Repository Split**: The project is split into two standalone repositories:
+> - **Core Engine & Backend**: [`sorovault`](file:///home/computeroracle/Desktop/sorovault) — Go RPC parser, XDR decoder, PostgreSQL registry, and REST API.
+> - **Visual Explorer & Studio**: [`sorovault-frontend`](file:///home/computeroracle/Desktop/sorovault-frontend) — Vite & TypeScript web application, interactive ABI inspector, Soroban simulation playground, and SDK generator (running at `http://localhost:3004`).
+
 SoroVault fetches a deployed contract's WASM, decodes the interface embedded in
 it, stores it, and serves a searchable registry — so tools and humans can
 discover what functions and types a contract exposes.
